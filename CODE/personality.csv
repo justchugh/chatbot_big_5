@@ -1,0 +1,12 @@
+factor,score,personality,response
+1,H,EH,"You are typically energized when interacting with co-workers, and tend to be more productive in team discussions. However, working independently might sometimes be a challenge for you."
+1,L,EL,You might prefer working independently on projects and achieve your best work working alone. You might tend to struggle with collaborating or discussing ideas with team members.
+2,H,AH,"You are likely to assist others with challenging tasks. You are also happy to collaborate with team members and work towards resolving problems in the workplace. In other words, your agreeable trait makes you a good problem solver."
+2,L,AL,You might tend to be more forceful with their opinions. You can be headstrong in their ideas. You might need to work on being more sympathetic to others' views and try to ensure you listen to other team members’ perspectives more.
+3,H,CH,"You generally prefer structured, ordered approaches to your work. You are not only ambitious but will also use your determination and preparedness to achieve their goals. You tend use schedules and plans to optimize their work. "
+3,L,CL,"You might tend to be much more flexible in your approach to work. Structures isn't always required for you, and you don’t rely heavily on being organized. This might make it challenging for such you to meet strict deadlines or manage your time efficiently."
+4,H,NH,"You typically find working in high-pressure situations a challenge. You prefer calmer work environments, which make it easier for them to avoid stress. In high-pressure work situations, you are likely to struggle with your emotions and be highly concerned when you make mistakes.
+"
+4,L,NL,"You can work in a more stable, predictable way, despite high-pressure situations. You will also have a more positive outlook in terms of challenging projects and are generally more optimistic. Staying calm where others might become stressed in the workplace comes naturally to you."
+5,H,OH,"You are willing to take new experiences in their stride. You can be highly creative, bringing new ideas to the table, and often use your imagination to make positive changes in the work environment. You have a better change to cope well with changes at work but will struggle with repetitive, mundane tasks that lack creativity and require logic. "
+5,L,OL,"You typically prefer methodical and logical approaches to their work. You are less likely to embrace change, preferring to maintain the status quo in terms of your work style."

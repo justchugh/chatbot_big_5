@@ -2,70 +2,71 @@
 import discord
 from discord.ext import commands
 import random
+from datetime import datetime
 
 bot_prefix = "!"
-client = commands.Bot(command_prefix=bot_prefix, case_insensitive=True)
+bot = commands.Bot(command_prefix=bot_prefix, case_insensitive=True)
 
-command_usage = 0
+cmd_usage = 0
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f"{client.user.name} is ready.")
-    await client.change_presence(activity=discord.Game(name=f"{client.command_prefix}help"))
+    print(f"{bot.user.name} is up and running.")
+    await bot.change_presence(activity=discord.Game(name=f"{bot.command_prefix}assist"))
 
-@client.command(name="ping")
+@bot.command(name="ping")
 async def ping(ctx):
-    global command_usage
-    await ctx.send(f"Pong! {round(client.latency * 1000)}ms")
-    command_usage += 1
+    global cmd_usage
+    await ctx.send(f"Pong! Latency: {round(bot.latency * 1000)}ms")
+    cmd_usage += 1
 
-@client.command(name="current_time")
-async def current_time(ctx):
-    global command_usage
+@bot.command(name="time")
+async def time(ctx):
+    global cmd_usage
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    await ctx.send(f"Current time: {now}")
-    command_usage += 1
+    await ctx.send(f"Time now: {now}")
+    cmd_usage += 1
 
-@client.command(name="usage_count")
-async def usage_count(ctx):
-    global command_usage
-    await ctx.send(f"Commands used: {command_usage}")
-    command_usage += 1
+@bot.command(name="usage")
+async def usage(ctx):
+    global cmd_usage
+    await ctx.send(f"Command count: {cmd_usage}")
+    cmd_usage += 1
 
-@client.command(name="number_guess")
-async def number_guess(ctx):
-    global command_usage
-    secret_number = random.randint(1, 10)
-    await ctx.send("Guess a number between 1 and 10")
+@bot.command(name="guess")
+async def guess(ctx):
+    global cmd_usage
+    number = random.randint(1, 10)
+    await ctx.send("Guess a number between 1 to 10")
 
-    def check_guess(msg):
+    def validate(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.isdigit()
 
     try:
-        guess = await client.wait_for("message", check=check_guess, timeout=15.0)
-        if int(guess.content) == secret_number:
-            await ctx.send("That's right!")
+        guess = await bot.wait_for("message", check=validate, timeout=15.0)
+        if int(guess.content) == number:
+            await ctx.send("Correct guess!")
         else:
-            await ctx.send(f"Nope! The number was {secret_number}")
+            await ctx.send(f"Wrong guess! It was {number}")
     except asyncio.TimeoutError:
-        await ctx.send("You didn't respond in time.")
+        await ctx.send("You took too long.")
 
-    command_usage += 1
+    cmd_usage += 1
 
-@client.command(name="help")
-async def help_command(ctx):
-    global command_usage
+@bot.command(name="assist")
+async def assist(ctx):
+    global cmd_usage
     help_text = (
-        "!ping - Bot's latency
+        "!ping - Latency check
 "
-        "!current_time - Current time
+        "!time - Current time
 "
-        "!usage_count - Number of commands used
+        "!usage - Command usage count
 "
-        "!number_guess - Guess the number game
+        "!guess - Number guessing game
 "
     )
     await ctx.send(help_text)
-    command_usage += 1
+    cmd_usage += 1
 
-client.run('YOUR_BOT_TOKEN')
+bot.run('YOUR_BOT_TOKEN')

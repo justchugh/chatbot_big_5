@@ -1,72 +1,68 @@
-
 import discord
 from discord.ext import commands
-import random
 from datetime import datetime
+import random
+import os
 
-bot_prefix = "!"
-bot = commands.Bot(command_prefix=bot_prefix, case_insensitive=True)
+# Load the bot token from an environment variable for security
+TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 
-cmd_count = 0
+prefix = "!!"
+client = commands.Bot(command_prefix=prefix, case_insensitive=True)
 
-@bot.event
+times_used = 0
+
+@client.event
 async def on_ready():
-    print(f"{bot.user.name} is running.")
-    await bot.change_presence(activity=discord.Game(name=f"{bot.command_prefix}help_commands"))
+    print(f"I am ready to go - {client.user.name}")
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{client.command_prefix}python_help. This bot is made by drakeerv."))
 
-@bot.command(name="ping")
-async def ping(ctx):
-    global cmd_count
-    await ctx.send(f"Pong! Latency is {round(bot.latency * 1000)}ms")
-    cmd_count += 1
+@client.command(name="ping")
+async def _ping(ctx):
+    global times_used
+    await ctx.send(f"Ping: {client.latency}")
+    times_used += 1
 
-@bot.command(name="time")
-async def time(ctx):
-    global cmd_count
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    await ctx.send(f"Current time: {now}")
-    cmd_count += 1
+@client.command(name="time")
+async def _time(ctx):
+    global times_used
+    now = datetime.now()
 
-@bot.command(name="command_count")
-async def command_count(ctx):
-    global cmd_count
-    await ctx.send(f"Commands used: {cmd_count}")
-    cmd_count += 1
+    am_pm = "AM" if now.strftime("%H") <= "12" else "PM"
+    current_time = now.strftime("%m/%d/%Y, %I:%M")
 
-@bot.command(name="guess_the_number")
-async def guess_the_number(ctx):
-    global cmd_count
-    number = random.randint(1, 10)
-    await ctx.send("Guess a number between 1 and 10")
+    await ctx.send("Current Time: " + current_time + ' ' + am_pm)
+    times_used += 1
+
+@client.command(name="times_used")
+async def _used(ctx):
+    global times_used
+    await ctx.send(f"Times used since last reboot: {times_used}")
+    times_used += 1
+
+@client.command(name="python_help")
+async def _python_help(ctx):
+    global times_used
+    msg = '\r\n'.join(["!!help: returns all of the commands and what they do.",
+                       "!!time: returns the current time.",
+                       "!!ping: returns the ping to the server."])
+    await ctx.send(msg)
+    times_used += 1
+
+@client.command()
+async def command(ctx):
+    computer = random.randint(1, 10)
+    await ctx.send('Guess my number')
 
     def check(msg):
-        return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.isdigit()
+        return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.isdigit() and 1 <= int(msg.content) <= 10
 
-    try:
-        guess = await bot.wait_for("message", check=check, timeout=15.0)
-        if int(guess.content) == number:
-            await ctx.send("Correct guess!")
-        else:
-            await ctx.send(f"Nope! It was {number}")
-    except asyncio.TimeoutError:
-        await ctx.send("You took too long.")
+    msg = await client.wait_for("message", check=check)
 
-    cmd_count += 1
+    if int(msg.content) == computer:
+        await ctx.send("Correct")
+    else:
+        await ctx.send(f"Nope, it was {computer}")
 
-@bot.command(name="help_commands")
-async def help_commands(ctx):
-    global cmd_count
-    help_text = (
-        "!ping - Bot's latency
-"
-        "!time - Current time
-"
-        "!command_count - Number of commands used
-"
-        "!guess_the_number - Number guessing game
-"
-    )
-    await ctx.send(help_text)
-    cmd_count += 1
-
-bot.run('YOUR_BOT_TOKEN')
+# Run the bot with the token from the environment variable
+client.run(TOKEN)

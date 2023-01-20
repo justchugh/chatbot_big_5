@@ -1,115 +1,72 @@
 
-import numpy as np
-import pandas as pd
-import nltk
-import pickle
+import discord
+from discord.ext import commands
+import random
 
-dataframe = pd.read_csv('newanswers.csv', index_col=False, header=None)
-x_train = dataframe[0].values
+prefix = "!"
+bot = commands.Bot(command_prefix=prefix, case_insensitive=True)
 
-contractions = {
-    "ain't": "am not",
-    "aren't": "are not",
-    "can't": "cannot",
-    "could've": "could have",
-    "couldn't": "could not",
-    "didn't": "did not",
-    "doesn't": "does not",
-    "don't": "do not",
-    "hadn't": "had not",
-    "hasn't": "has not",
-    "haven't": "have not",
-    "he'd": "he would",
-    "he'll": "he will",
-    "he's": "he is",
-    "I'd": "I would",
-    "I'll": "I will",
-    "I'm": "I am",
-    "I've": "I have",
-    "isn't": "is not",
-    "it'd": "it would",
-    "it'll": "it will",
-    "it's": "it is",
-    "let's": "let us",
-    "might've": "might have",
-    "mightn't": "might not",
-    "must've": "must have",
-    "mustn't": "must not",
-    "o'clock": "of the clock",
-    "should've": "should have",
-    "shouldn't": "should not",
-    "that's": "that is",
-    "there's": "there is",
-    "they'd": "they would",
-    "they'll": "they will",
-    "they're": "they are",
-    "they've": "they have",
-    "wasn't": "was not",
-    "we'd": "we would",
-    "we'll": "we will",
-    "we're": "we are",
-    "we've": "we have",
-    "weren't": "were not",
-    "what's": "what is",
-    "where's": "where is",
-    "who's": "who is",
-    "won't": "will not",
-    "would've": "would have",
-    "wouldn't": "would not",
-    "you'd": "you would",
-    "you'll": "you will",
-    "you're": "you are",
-    "you've": "you have"
-}
+usage_count = 0
 
-def replace_contractions(text):
-    words = text.split()
-    replaced_text = [contractions[word] if word in contractions else word for word in words]
-    return " ".join(replaced_text)
+@bot.event
+async def on_ready():
+    print(f"Bot is online - {bot.user.name}")
+    await bot.change_presence(activity=discord.Game(name=f"{bot.command_prefix}commands"))
 
-def preprocess_text(text):
-    lemmatizer = nltk.WordNetLemmatizer()
-    text = replace_contractions(text)
-    tokens = nltk.word_tokenize(text)
-    tokens = [word.lower() for word in tokens]
-    stop_words = set(nltk.corpus.stopwords.words('english')) - {'no', 'not', 'nor'}
-    filtered_tokens = [word for word in tokens if word.isalpha() and word not in stop_words]
-    lemmatized_tokens = [lemmatizer.lemmatize(word) for word in filtered_tokens]
-    return lemmatized_tokens
+@bot.command(name="ping")
+async def ping(ctx):
+    global usage_count
+    await ctx.send(f"Ping! Latency is {round(bot.latency * 1000)}ms")
+    usage_count += 1
 
-def join_tokens(tokens_list):
-    return [" ".join(tokens) for tokens in tokens_list]
+@bot.command(name="current_time")
+async def current_time(ctx):
+    global usage_count
+    now = datetime.now()
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    await ctx.send(f"Current time: {current_time}")
+    usage_count += 1
 
-def vectorize_text(train_texts, test_texts):
-    from sklearn.feature_extraction.text import CountVectorizer
-    vectorizer = CountVectorizer(ngram_range=(1, 2))
-    x_train_vec = vectorizer.fit_transform(train_texts).toarray()
-    x_test_vec = vectorizer.transform(test_texts).toarray()
-    return x_test_vec
+@bot.command(name="usage")
+async def usage(ctx):
+    global usage_count
+    await ctx.send(f"Total commands used: {usage_count}")
+    usage_count += 1
 
-def predict_sentiment(test_vectors):
-    model_filename = 'finalized_model.sav'
-    with open(model_filename, 'rb') as model_file:
-        model = pickle.load(model_file)
-    predictions = model.predict(test_vectors)
-    return predictions
+@bot.command(name="guess_number")
+async def guess_number(ctx):
+    global usage_count
+    number = random.randint(1, 10)
+    await ctx.send("Guess a number between 1 and 10")
 
-def generate_labels(test_texts):
-    clean_train_texts = [preprocess_text(text) for text in x_train]
-    clean_train_texts = join_tokens(clean_train_texts)
-    
-    clean_test_texts = [preprocess_text(text) for text in test_texts]
-    clean_test_texts = join_tokens(clean_test_texts)
+    def is_correct(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.isdigit()
 
-    test_vectors = vectorize_text(clean_train_texts, clean_test_texts)
+    try:
+        guess = await bot.wait_for("message", check=is_correct, timeout=15.0)
+        if int(guess.content) == number:
+            await ctx.send("Correct!")
+        else:
+            await ctx.send(f"Incorrect! The number was {number}")
+    except asyncio.TimeoutError:
+        await ctx.send("You took too long to guess.")
 
-    predictions = predict_sentiment(test_vectors)
-    return predictions
+    usage_count += 1
 
-# Example usage:
-# x_test = ['I keep care of not leaving my belongings anywhere',
-#           'I try to not leave things anywhere',
-#           "I don't think strongly about this",
-#           'I am too lazy so I sometimes leave things around',
-#           'I always leave things around']
-# print(generate_labels(x_test))
+@bot.command(name="commands")
+async def commands(ctx):
+    global usage_count
+    commands_list = (
+        "!ping - Check the bot's latency
+"
+        "!current_time - Get the current time
+"
+        "!usage - See command usage count
+"
+        "!guess_number - Play a guessing game
+"
+    )
+    await ctx.send(commands_list)
+    usage_count += 1
+
+bot.run('YOUR_BOT_TOKEN')

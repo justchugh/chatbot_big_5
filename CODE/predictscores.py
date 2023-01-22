@@ -9,7 +9,6 @@ dataframe = pd.read_csv('newanswers.csv', index_col=False, header=None)
 x_train = dataframe[0].values
 
 contractions = {
-    "ain't": "am not",
     "aren't": "are not",
     "can't": "cannot",
     "couldn't": "could not",
@@ -53,7 +52,7 @@ contractions = {
 
 def expand_contractions(text):
     words = text.split()
-    expanded_text = [contractions[word] if word in contractions else word for word in words]
+    expanded_text = [contractions.get(word, word) for word in words]
     return " ".join(expanded_text)
 
 def clean_text(text):

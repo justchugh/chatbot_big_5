@@ -1,0 +1,28 @@
+{
+    "intents": [{
+            "tag": "greeting",
+            "patterns": ["hi", "how are you", "is anyone there?", "hello", "hey", "good day", "whats up"],
+            "responses": ["Hello!", "Good to see you again!", "Hey!", "Hello there", "Hello again", "Hey there"],
+            "context_set": ""
+        },
+        {
+            "tag": "goodbye",
+            "patterns": ["cya", "see you later", "goodbye", "i am leaving", "have a Good day", "bye"],
+            "responses": ["Sad to see you go..", "Talk to you later", "Goodbye!"],
+            "context_set": ""
+        }, {
+            "tag": "yes",
+            "patterns": ["yes", "yeah", "yup", "totally", "cool", "ok", "ya","yes I'd love to","yes I would love to","yes why not",
+                "let's start","yes sure","sure why not","let us begin","let's begin","let us start","yes definitely","surely",
+                "let's go","yes let's begin"],
+            "responses": ["Ok you replied yes!", "Ok you replied yes!"],
+            "context_set": ""
+        }, {
+            "tag": "no",
+            "patterns": ["no", "na", "nope", "disagree", "nah", "nooo"],
+            "responses": ["Ok you replied no!", "Ok you replied no!"],
+            "context_set": ""
+        }
+
+    ]
+}
